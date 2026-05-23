@@ -9,6 +9,9 @@ on:
 permissions:
   contents: write
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   build-linux:
     name: Build Linux
@@ -76,7 +79,7 @@ jobs:
             mingw-w64-x86_64-pkg-config
       - name: Build
         env:
-          CFLAGS: "-O2"
+          CFLAGS: "-O2 -std=gnu17"
         run: make -j$(nproc) zelda3
       - name: Package
         run: |
