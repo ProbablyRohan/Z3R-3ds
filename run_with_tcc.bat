@@ -28,7 +28,7 @@ IF NOT EXIST "%SDL2%\lib\x64\SDL2.dll" (
 IF NOT EXIST "zelda3_assets.dat" (
   ECHO:
   ECHO ERROR: zelda3_assets.dat was not found.
-  ECHO You need to extract assets from the ROM first, or get this file from a friend. Please see README.md
+  ECHO You need to extract assets from the ROM first, or get this file from a friend. Please see readme.md
   ECHO:
   PAUSE
   EXIT /B 1

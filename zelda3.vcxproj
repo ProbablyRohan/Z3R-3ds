@@ -774,7 +774,7 @@
       <CopyToOutputDirectory Condition="'$(Configuration)|$(Platform)'=='ReleaseDeploy|Win32'">Always</CopyToOutputDirectory>
     </Content>
     <Text Include="LICENSE.txt" />
-    <Content Include="README.md">
+    <Content Include="readme.md">
       <CopyToOutputDirectory Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Never</CopyToOutputDirectory>
       <CopyToOutputDirectory Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Never</CopyToOutputDirectory>
       <CopyToOutputDirectory Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Never</CopyToOutputDirectory>
@@ -782,7 +782,7 @@
       <CopyToOutputDirectory Condition="'$(Configuration)|$(Platform)'=='ReleaseDeploy|x64'">Always</CopyToOutputDirectory>
       <CopyToOutputDirectory Condition="'$(Configuration)|$(Platform)'=='ReleaseDeploy|Win32'">Always</CopyToOutputDirectory>
     </Content>
-    <Text Include="README.md" />
+    <Text Include="readme.md" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="zelda3.ini">

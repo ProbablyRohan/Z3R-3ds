@@ -472,7 +472,7 @@
     <Text Include="LICENSE.txt">
       <Filter>Deploy</Filter>
     </Text>
-    <Text Include="README.md">
+    <Text Include="readme.md">
       <Filter>Deploy</Filter>
     </Text>
   </ItemGroup>
