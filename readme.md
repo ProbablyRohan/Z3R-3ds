@@ -13,7 +13,7 @@ runtime assets. Do not commit or redistribute ROMs, generated asset packs, save
 files, MSU packs, or local INI overrides.
 
 ## Launcher: 
-https://github.com/xander-haj/Z3R-Launcher
+https://github.com/xander-haj/lawn
 
 ## Wiki: 
 https://xander-haj.github.io/Z3R-Wiki/index.html
