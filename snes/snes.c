@@ -46,7 +46,6 @@ static int snes_getAccessTime(Snes* snes, uint32_t adr); // Memory access speed 
 Snes* snes_init(uint8_t *ram) {
   Snes* snes = (Snes * )malloc(sizeof(Snes));
   snes->ram = ram;
-<<<<<<< HEAD
   snes->cpu = cpu_init(snes, 0);
   snes->apu = apu_init();
   snes->dma = dma_init(snes);

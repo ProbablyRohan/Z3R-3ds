@@ -298,10 +298,6 @@ void RenderText_Draw_MessageCharacters();
 void RenderText_Draw_Finish();
 // Renders a single character glyph using the variable-width font engine
 void VWF_RenderSingle(int c);
-=======
-// Renders a single character glyph using the variable-width font engine
-void VWF_RenderSingle(int c);
->>>>>>> 3ds
 // Presents a 2-low-or-3 choice menu (e.g., Yes/No with item context)
 void RenderText_Draw_Choose2LowOr3();
 // Presents an item selection choice within a dialog

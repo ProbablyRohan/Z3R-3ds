@@ -723,17 +723,10 @@ static void ZeldaRunGameLoop() {
  * player so audio is ready to render silence until a song is loaded.
  * The 0x2000 byte SRAM allocation matches the SNES cart's S-RAM size.
  */
-<<<<<<< HEAD
 void ZeldaInitialize() {
   g_zenv.dma = dma_init(NULL);
   g_zenv.ppu = ppu_init();
   g_zenv.ram = g_ram;
-=======
-void ZeldaInitialize() {
-  g_zenv.dma = dma_init(NULL);
-  g_zenv.ppu = ppu_init();
-  g_zenv.ram = g_ram;
->>>>>>> 3ds
   g_zenv.sram = (uint8*)calloc(8192, 1);
   g_zenv.vram = g_zenv.ppu->vram;
   g_zenv.player = SpcPlayer_Create();
