@@ -50,7 +50,11 @@
 // SPC700 emulated music/SFX player
 #include "spc_player.h"
 // Opus audio codec for .opuz MSU file decoding
+#ifdef __3DS__
+#include "opus/opus.h"
+#else
 #include "third_party/opus-1.3.1-stripped/opus.h"
+#endif
 // Runtime configuration (audio_freq, msu_path, msuvolume, resume_msu)
 #include "config.h"
 // ROM asset data tables (kEntranceData_musicTrack)

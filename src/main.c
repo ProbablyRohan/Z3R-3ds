@@ -64,6 +64,10 @@
 #include "util.h"
 #include "audio.h"
 
+#ifdef __3DS__
+#include <3ds.h>
+#endif
+
 /* Build-time toggle. When true, main() skips LoadRom() so the host can run
  * the asset-driven C reimplementation without ever loading the original
  * SNES ROM. Left at false in normal builds; flipping it disables the
@@ -603,6 +607,12 @@ void OpenGLRenderer_Create(struct RendererFuncs *funcs, bool use_opengl_es);
  * Returns 0 on a clean shutdown, 1 if SDL/window/renderer init failed.
  */
 int main(int argc, char** argv) {
+#if __3DS__
+  gfxInitDefault();
+  consoleInit(GFX_BOTTOM, NULL);
+  osSetSpeedupEnable(true);
+  chdir("sdmc:/3ds/zelda3/");
+#endif
   argc--, argv++;
   const char *config_file = NULL;
   /* `--config <path>` lets the user point at an arbitrary INI file
