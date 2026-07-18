@@ -1,3 +1,34 @@
+# Z3R-3DS
+
+This is a port of Z3R (a pc port of The Legend of Zelda: A Link to the Past) to 3ds
+
+## Build Instructions
+Ensure that you have a [devkitpro installation](https://devkitpro.org/wiki/Getting_Started) configured with the 3ds development packages (3ds-dev) installed before building. As SDL2 is not packaged in devkitpro (yet) you have to first build SDL from source:
+```
+git clone https://github.com/libsdl-org/SDL/
+cd SDL
+git checkout release-2.32.10 # Latest SDL2 release
+cmake -S. -Bbuild -DCMAKE_TOOLCHAIN_FILE="$DEVKITPRO/cmake/3DS.cmake" -DCMAKE_BUILD_TYPE=Release
+cmake --build build
+cmake --install build
+```
+You can then build Z3R for 3ds:
+```
+git clone https://github.com/ProbablyRohan/Z3R-3ds
+cd Z3R-3ds/src/platform/3ds
+make
+```
+To actually run the game you need a `zelda3_assets.dat` file placed in the 3ds/zelda3 directory on your 3ds, along with a `zelda.ini` file in the same directory. `zelda3_assets.dat` can be extracted by placing a USA ALTTP rom at the project root, named either `zelda3.sfc` or `zelda3.smc`, and running `python assets/restool.py --extract-from-rom`.
+
+## Limitations
+- Has to use the SDL-software renderer, as SDL2 does not yet support hardware rendering for the 3ds
+- Untested on a real o3ds but runs significantly worse on n3ds with n3ds features disabled
+- Not completely tested all the way through on n3ds
+- Performance on n3ds is fine, slight slowdowns at times, especially outside
+
+
+Below is the original readme:
+
 # Discord Server
 https://discord.gg/EQ6E7P3cC8
 
