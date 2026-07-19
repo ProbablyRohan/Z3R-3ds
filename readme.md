@@ -1,6 +1,13 @@
 # Z3R-3DS
 
-This is a port of Z3R (a pc port of The Legend of Zelda: A Link to the Past) to 3ds
+This is a port of Z3R (a fork of snesrev's pc port of The Legend of Zelda: A Link to the Past) to 3ds
+
+<img width="250" height="250" alt="latest-qr" src="https://github.com/user-attachments/assets/6f958b9e-b6bc-4fe3-b435-e90b10f810da" />
+
+QR Code for latest cia file
+
+## Installation Instructions
+Either install the cia file with fbi (qr above) or download the 3dsx file from releases and put in the `3ds/zelda3` directory on your 3ds. Then you need a `zelda3_assets.dat` file placed in the 3ds/zelda3 directory on your 3ds, along with a `zelda.ini` file in the same directory. `zelda3_assets.dat` can be extracted by placing a USA ALTTP rom at the project root, named either `zelda3.sfc` or `zelda3.smc`, and running `python assets/restool.py --extract-from-rom`.
 
 ## Build Instructions
 Ensure that you have a [devkitpro installation](https://devkitpro.org/wiki/Getting_Started) configured with the 3ds development packages (3ds-dev) installed before building. As SDL2 is not packaged in devkitpro (yet) you have to first build SDL from source:
@@ -28,6 +35,8 @@ To actually run the game you need a `zelda3_assets.dat` file placed in the 3ds/z
 
 
 Below is the original readme:
+
+---
 
 # Discord Server
 https://discord.gg/EQ6E7P3cC8
