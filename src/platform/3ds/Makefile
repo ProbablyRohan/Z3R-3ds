@@ -31,45 +31,82 @@ include $(DEVKITARM)/3ds_rules
 #     - icon.png
 #     - <libctru folder>/default_icon.png
 #---------------------------------------------------------------------------------
-SRC_DIR     := ../../../src
-TARGET		:=	zelda3
-BUILD		:=	build
-SOURCES		:=	$(SRC_DIR) \
-				$(SRC_DIR)/../snes \
-				$(SRC_DIR)/../third_party/gl_core
-#DATA		:= data
-INCLUDES	:=	include \
-				../../..
-#GRAPHICS	:=	gfx
-#GFXBUILD	:=	$(BUILD)
-#ROMFS		:=	romfs
-#GFXBUILD	:=	$(ROMFS)/gfx
+APP_TITLE				:= 	The Legend of Zelda: A Link to the Past
+APP_DESCRIPTION	:=	The Legend of Zelda: A Link to the Past
+APP_AUTHOR			:=	Nintendo, snesrev
+
+SRC_DIR 		:= ../../../src
+
+TARGET			:=	zelda3
+OUTDIR			:=	out
+BUILD				:=	build
+SOURCES			:=	$(SRC_DIR) \
+								$(SRC_DIR)/../snes \
+								$(SRC_DIR)/../third_party/gl_core
+DATA				:=	data
+INCLUDES		:=	include \
+								../../../
+GRAPHICS		:=	assets/gfx
+ROMFS				:=	assets/romfs
+GFXBUILD		:=	$(ROMFS)/gfx
+
+# If left blank, will try to use "icon.png", "$(TARGET).png", or the default ctrulib icon, in that order
+ICON					:=	assets/icon.png
+
+BANNER_AUDIO	:=	assets/audio.wav
+BANNER_IMAGE	:=	assets/banner.png
+RSF_PATH			:=	assets/app.rsf
+
+
+# If left blank, makerom will use the default Homebrew logo
+LOGO					:=
+
+# If left blank, makerom will use default values (0xff3ff and CTR-P-CTAP, respectively)
+UNIQUE_ID			:=  0xFF3FF
+PRODUCT_CODE	:=	CTR-P-ALTTP
+
+# Don't really need to change this
+ICON_FLAGS    :=	nosavebackups,visible
 
 #---------------------------------------------------------------------------------
 # options for code generation
 #---------------------------------------------------------------------------------
 ARCH	:=	-march=armv6k -mtune=mpcore -mfloat-abi=hard -mtp=soft
 
-CFLAGS	:=	-g -Wall -O2 -mword-relocations \
-			-ffunction-sections \
-			$(ARCH)
+CFLAGS	:=	-g -gdwarf-4 -Wall -Wextra -Wno-psabi -O3 -mword-relocations -flto=auto \
+			-fomit-frame-pointer -ffunction-sections \
+			-Wno-unused-parameter \
+			$(ARCH) \
+			-DVERSION_MAJOR=${VERSION_MAJOR} \
+			-DVERSION_MINOR=${VERSION_MINOR} \
+			-DVERSION_MICRO=${VERSION_MICRO} \
+			-DGIT_REV=\"${GIT_REV}\" \
+			-DJSON_HAS_FILESYSTEM=0 \
+			-DJSON_HAS_EXPERIMENTAL_FILESYSTEM=0 \
+			-DFILE_BUFFERSIZE=262144 \
+			-DXFER_BUFFERSIZE=32768 \
+			-DSOCK_BUFFERSIZE=32768
 
-CFLAGS	+=	$(INCLUDE) -D__3DS__ \
-			-Wno-parentheses -Wno-missing-braces
+CFLAGS	+=	$(INCLUDE) -DARM11 -D__3DS__ -D_GNU_SOURCE=1
 
-CXXFLAGS	:= $(CFLAGS) -fno-rtti -fno-exceptions -std=gnu++11
+CXXFLAGS	:= $(CFLAGS) -fno-rtti -std=gnu++23
 
 ASFLAGS	:=	-g $(ARCH)
 LDFLAGS	=	-specs=3dsx.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map)
 
 LIBS	:= -lopus -lSDL2 -lSDL2main -lm -lctru -lm
 
+CCACHE	:=	$(shell command -v ccache 2>/dev/null)
+ifneq ($(strip $(CCACHE)),)
+CXX		:=	$(CCACHE) $(CXX)
+CC		:=	$(CCACHE) $(CC)
+endif
+
 #---------------------------------------------------------------------------------
 # list of directories containing libraries, this must be the top level containing
 # include and lib
 #---------------------------------------------------------------------------------
-LIBDIRS	:= $(PORTLIBS) $(CTRULIB)
-
+LIBDIRS	:= $(CTRULIB) $(PORTLIBS)
 
 #---------------------------------------------------------------------------------
 # no real need to edit anything past this point unless you need to add additional
@@ -78,7 +115,7 @@ LIBDIRS	:= $(PORTLIBS) $(CTRULIB)
 ifneq ($(BUILD),$(notdir $(CURDIR)))
 #---------------------------------------------------------------------------------
 
-export OUTPUT	:=	$(CURDIR)/$(TARGET)
+export OUTPUT	:=	$(CURDIR)/$(OUTDIR)/$(TARGET)
 export TOPDIR	:=	$(CURDIR)
 
 export VPATH	:=	$(foreach dir,$(SOURCES),$(CURDIR)/$(dir)) \
@@ -109,24 +146,13 @@ else
 endif
 #---------------------------------------------------------------------------------
 
-#---------------------------------------------------------------------------------
-ifeq ($(GFXBUILD),$(BUILD))
-#---------------------------------------------------------------------------------
-export T3XFILES :=  $(GFXFILES:.t3s=.t3x)
-#---------------------------------------------------------------------------------
-else
-#---------------------------------------------------------------------------------
-export ROMFS_T3XFILES	:=	$(patsubst %.t3s, $(GFXBUILD)/%.t3x, $(GFXFILES))
-export T3XHFILES		:=	$(patsubst %.t3s, $(BUILD)/%.h, $(GFXFILES))
-#---------------------------------------------------------------------------------
-endif
-#---------------------------------------------------------------------------------
+export T3XFILES		:=	$(GFXFILES:.t3s=.t3x)
 
 export OFILES_SOURCES 	:=	$(CPPFILES:.cpp=.o) $(CFILES:.c=.o) $(SFILES:.s=.o)
 
 export OFILES_BIN	:=	$(addsuffix .o,$(BINFILES)) \
 			$(PICAFILES:.v.pica=.shbin.o) $(SHLISTFILES:.shlist=.shbin.o) \
-			$(addsuffix .o,$(T3XFILES))
+			$(if $(filter $(BUILD),$(GFXBUILD)),$(addsuffix .o,$(T3XFILES)))
 
 export OFILES := $(OFILES_BIN) $(OFILES_SOURCES)
 
@@ -157,43 +183,29 @@ else
 endif
 
 ifeq ($(strip $(NO_SMDH)),)
-	export _3DSXFLAGS += --smdh=$(CURDIR)/$(TARGET).smdh
+	export _3DSXFLAGS += --smdh=$(CURDIR)/$(OUTDIR)/$(TARGET).smdh
 endif
 
 ifneq ($(ROMFS),)
 	export _3DSXFLAGS += --romfs=$(CURDIR)/$(ROMFS)
 endif
 
-.PHONY: all clean
+.PHONY: all clean format
 
 #---------------------------------------------------------------------------------
-all: $(BUILD) $(GFXBUILD) $(DEPSDIR) $(ROMFS_T3XFILES) $(T3XHFILES)
-	@$(MAKE) --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile
-
-$(BUILD):
-	@mkdir -p $@
-
-ifneq ($(GFXBUILD),$(BUILD))
-$(GFXBUILD):
-	@mkdir -p $@
-endif
-
-ifneq ($(DEPSDIR),$(BUILD))
-$(DEPSDIR):
-	@mkdir -p $@
-endif
-
+all:
+	@mkdir -p $(BUILD) $(GFXBUILD) $(OUTDIR)
+	@$(MAKE) --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile $(OUTPUT).3dsx
+	@bannertool makebanner -i "$(BANNER_IMAGE)" -a "$(BANNER_AUDIO)" -o $(BUILD)/banner.bnr
+	@bannertool makesmdh -s "$(APP_TITLE)" -l "$(APP_DESCRIPTION)" -p "$(APP_AUTHOR)" -i "$(APP_ICON)" -f "$(ICON_FLAGS)" -o $(BUILD)/icon.icn
+	@makerom -f cia -o $(OUTPUT).cia -target t -exefslogo -elf "$(OUTPUT).elf" -rsf "$(RSF_PATH)" -major "$(VERSION_MAJOR)" -minor "$(VERSION_MINOR)" -micro "$(VERSION_MICRO)" -banner "$(BUILD)/banner.bnr" -icon "$(BUILD)/icon.icn" -DAPP_TITLE="$(APP_TITLE)" -DAPP_PRODUCT_CODE="$(PRODUCT_CODE)" -DAPP_UNIQUE_ID="$(UNIQUE_ID)"
 #---------------------------------------------------------------------------------
 clean:
 	@echo clean ...
-	@rm -fr $(BUILD) $(TARGET).3dsx $(OUTPUT).smdh $(TARGET).elf $(GFXBUILD)
-
+	@rm -fr $(BUILD) $(GFXBUILD) $(OUTDIR)
 #---------------------------------------------------------------------------------
-$(GFXBUILD)/%.t3x	$(BUILD)/%.h	:	%.t3s
-#---------------------------------------------------------------------------------
-	@echo $(notdir $<)
-	@tex3ds -i $< -H $(BUILD)/$*.h -d $(DEPSDIR)/$*.d -o $(GFXBUILD)/$*.t3x
-
+format:
+	clang-format -i -style=file $(foreach dir,$(FORMATSOURCES),$(wildcard $(dir)/*.c) $(wildcard $(dir)/*.cpp) $(wildcard $(dir)/*.tcc)) $(foreach dir,$(FORMATINCLUDES),$(wildcard $(dir)/*.h) $(wildcard $(dir)/*.hpp))
 #---------------------------------------------------------------------------------
 else
 
@@ -215,11 +227,8 @@ $(OUTPUT).elf	:	$(OFILES)
 	@$(bin2o)
 
 #---------------------------------------------------------------------------------
-.PRECIOUS	:	%.t3x
-#---------------------------------------------------------------------------------
 %.t3x.o	%_t3x.h :	%.t3x
 #---------------------------------------------------------------------------------
-	@echo $(notdir $<)
 	@$(bin2o)
 
 #---------------------------------------------------------------------------------
@@ -247,12 +256,6 @@ endef
 %.shbin.o %_shbin.h : %.shlist
 	@echo $(notdir $<)
 	@$(call shader-as,$(foreach file,$(shell cat $<),$(dir $<)$(file)))
-
-#---------------------------------------------------------------------------------
-%.t3x	%.h	:	%.t3s
-#---------------------------------------------------------------------------------
-	@echo $(notdir $<)
-	@tex3ds -i $< -H $*.h -d $*.d -o $*.t3x
 
 -include $(DEPSDIR)/*.d
 
